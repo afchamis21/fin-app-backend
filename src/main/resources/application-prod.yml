@@ -1,0 +1,25 @@
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+auth:
+  jwt:
+    user:
+      access-token:
+        duration: 5
+        unit: minutes
+        encryption-key: ${ACCESS_JWT_KEY}
+      refresh-token:
+        duration: 24
+        unit: hours
+        encryption-key: ${REFRESH_JWT_KEY}
+cors:
+  allowed-urls: ${CORS_ALLOWED_URLS}

@@ -1,0 +1,26 @@
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/fin_app
+    username: postgres
+    password: pass
+
+auth:
+  jwt:
+    user:
+      access-token:
+        duration: 5
+        unit: minutes
+        encryption-key: M1PqcWedC47q5kRtAvTrQ2VMvob6kBno3wgi6gWSf8Bea+koV3YSbJSnswWiPpin9uQfE32prIoLHwzb9qSl/A==
+      refresh-token:
+        duration: 24
+        unit: hours
+        encryption-key: 144/E6zjHNAt3khxvXXXF/uV1+XHUj4SlNH68TJC46D40rykAH2xSsNWtZGDEHfqvo+BNwB+eYUSza1U7FDXPg==
+cors:
+  allowed-urls:
+    - "http://localhost:5173"
