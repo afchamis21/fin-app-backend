@@ -4,7 +4,7 @@ import io.github.afchamis21.finapp.context.Context
 import io.github.afchamis21.finapp.domain.category.CategoryType
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.dto.ProfitChartDTO
-import io.github.afchamis21.finapp.repo.EntryJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.EntryJpaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.math.BigDecimal

@@ -2,7 +2,7 @@ package io.github.afchamis21.finapp.service
 
 import io.github.afchamis21.finapp.domain.auth.RefreshToken
 import io.github.afchamis21.finapp.domain.user.User
-import io.github.afchamis21.finapp.repo.RefreshTokenJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.RefreshTokenJpaRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 

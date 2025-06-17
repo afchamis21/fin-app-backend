@@ -2,6 +2,7 @@ package io.github.afchamis21.finapp.domain.category
 
 import io.github.afchamis21.finapp.domain.AuditableEntity
 import io.github.afchamis21.finapp.domain.user.User
+import io.github.afchamis21.finapp.repo.cache.contracts.ICacheable
 import jakarta.persistence.*
 import lombok.EqualsAndHashCode
 import org.hibernate.annotations.OnDelete
@@ -26,5 +27,8 @@ class Category(
     @Column(nullable = true) var goal: BigDecimal?,
 
     createDt: Instant? = null, updateDt: Instant? = null
-) : AuditableEntity(createDt, updateDt) {
+) : AuditableEntity(createDt, updateDt), ICacheable<Long> {
+    override fun getCacheKey(): Long {
+        return id!!
+    }
 }

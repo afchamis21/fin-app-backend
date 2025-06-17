@@ -1,7 +1,7 @@
 package io.github.afchamis21.finapp.controller
 
-import io.github.afchamis21.finapp.auth.types.AdminAuth
 import io.github.afchamis21.finapp.auth.types.JwtAuth
+import io.github.afchamis21.finapp.auth.types.NoAuth
 import io.github.afchamis21.finapp.http.dto.UserDTO
 import io.github.afchamis21.finapp.http.request.user.RegisterUserRequest
 import io.github.afchamis21.finapp.http.request.user.UpdateUserRequest
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/user")
 class UserController(private val userService: UserService) {
 
-    @AdminAuth
+    @NoAuth
     @PostMapping
     fun registerUser(@RequestBody @Valid req: RegisterUserRequest): Response<UserDTO> {
         return Response.build(userService.register(req), HttpStatus.CREATED)

@@ -1,6 +1,7 @@
 package io.github.afchamis21.finapp.domain.user
 
 import io.github.afchamis21.finapp.domain.AuditableEntity
+import io.github.afchamis21.finapp.repo.cache.contracts.ICacheable
 import jakarta.persistence.*
 import java.time.Instant
 
@@ -13,4 +14,8 @@ class User(
     @Column(nullable = false) var password: String,
 
     createDt: Instant? = null, updateDt: Instant? = null,
-) : AuditableEntity(createDt, updateDt)
+) : AuditableEntity(createDt, updateDt), ICacheable<Long> {
+    override fun getCacheKey(): Long {
+        return id!!
+    }
+}

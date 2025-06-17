@@ -1,4 +1,4 @@
-package io.github.afchamis21.finapp.repo
+package io.github.afchamis21.finapp.repo.jpa
 
 import io.github.afchamis21.finapp.domain.category.Category
 import jakarta.transaction.Transactional

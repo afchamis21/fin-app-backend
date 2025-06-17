@@ -7,7 +7,7 @@ import io.github.afchamis21.finapp.http.dto.EntryDTO
 import io.github.afchamis21.finapp.http.dto.toDTO
 import io.github.afchamis21.finapp.http.request.entry.CreateEntryRequest
 import io.github.afchamis21.finapp.http.request.entry.UpdateEntryRequest
-import io.github.afchamis21.finapp.repo.EntryJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.EntryJpaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate

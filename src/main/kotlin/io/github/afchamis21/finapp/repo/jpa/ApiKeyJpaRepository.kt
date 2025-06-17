@@ -1,4 +1,4 @@
-package io.github.afchamis21.finapp.repo
+package io.github.afchamis21.finapp.repo.jpa
 
 import io.github.afchamis21.finapp.domain.auth.ApiKey
 import org.springframework.data.jpa.repository.JpaRepository

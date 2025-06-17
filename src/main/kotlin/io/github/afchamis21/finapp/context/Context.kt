@@ -7,6 +7,7 @@ import java.util.*
 object Context {
     private val threadLocal = ThreadLocal<ContextData>()
     private const val TRANSACTION_KEY = "transaction-id"
+    private const val USER_ID_KEY = "user-id"
 
     fun init() {
         threadLocal.set(ContextData())
@@ -19,6 +20,10 @@ object Context {
         get() = threadLocal.get().userId
         set(value) {
             threadLocal.get().userId = value
+
+            value?.let {
+                MDC.put(USER_ID_KEY, value.toString())
+            } ?: MDC.remove(USER_ID_KEY)
         }
 
     fun getStart(): Instant = threadLocal.get().start

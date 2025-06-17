@@ -7,7 +7,7 @@ import io.github.afchamis21.finapp.http.dto.CategoryDTO
 import io.github.afchamis21.finapp.http.dto.toDTO
 import io.github.afchamis21.finapp.http.request.category.CreateCategoryRequest
 import io.github.afchamis21.finapp.http.request.category.UpdateCategoryRequest
-import io.github.afchamis21.finapp.repo.CategoryJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.CategoryJpaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 

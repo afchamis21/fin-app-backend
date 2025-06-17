@@ -5,7 +5,7 @@ import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.dto.LoginDTO
 import io.github.afchamis21.finapp.http.request.auth.LoginRequest
 import io.github.afchamis21.finapp.http.request.auth.RefreshRequest
-import io.github.afchamis21.finapp.repo.RefreshTokenJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.RefreshTokenJpaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service

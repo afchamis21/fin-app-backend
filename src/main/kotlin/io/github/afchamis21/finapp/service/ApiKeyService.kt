@@ -1,6 +1,6 @@
 package io.github.afchamis21.finapp.service
 
-import io.github.afchamis21.finapp.repo.ApiKeyJpaRepository
+import io.github.afchamis21.finapp.repo.jpa.ApiKeyJpaRepository
 import org.springframework.stereotype.Service
 import java.time.Instant
 

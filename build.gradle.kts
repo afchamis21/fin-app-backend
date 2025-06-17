@@ -25,9 +25,12 @@ repositories {
     mavenCentral()
 }
 
+extra["springAiVersion"] = "1.0.0"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     compileOnly("org.projectlombok:lombok")
@@ -39,7 +42,13 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.security:spring-security-core")
-    implementation("com.auth0:java-jwt:3.18.2")
+    implementation("com.auth0:java-jwt:4.4.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}")
+    }
 }
 
 kotlin {

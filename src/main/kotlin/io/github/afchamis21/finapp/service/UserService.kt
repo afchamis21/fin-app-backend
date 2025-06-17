@@ -8,14 +8,14 @@ import io.github.afchamis21.finapp.http.dto.UserDTO
 import io.github.afchamis21.finapp.http.dto.toDTO
 import io.github.afchamis21.finapp.http.request.user.RegisterUserRequest
 import io.github.afchamis21.finapp.http.request.user.UpdateUserRequest
-import io.github.afchamis21.finapp.repo.UserJpaRepository
+import io.github.afchamis21.finapp.repo.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val repository: UserJpaRepository,
+    private val repository: UserRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
     private val refreshTokenService: RefreshTokenService
 ) {
@@ -45,9 +45,8 @@ class UserService(
 
     fun findCurrentUser(): User {
         log.info("Searching for current user (ID: [{}])", Context.userId)
-        val forbiddenEx = HttpException(HttpStatus.FORBIDDEN)
-        val userId = Context.userId ?: throw forbiddenEx
-        return repository.findById(userId).orElseThrow { forbiddenEx }
+        val userId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
+        return repository.findById(userId) ?: throw HttpException(HttpStatus.FORBIDDEN)
     }
 
     fun getCurrentUser(): UserDTO {
@@ -63,8 +62,8 @@ class UserService(
         log.info("Updating current user with payload [{}]", req)
         var user = findCurrentUser()
 
-        var reAuth = false;
-        var updated = false;
+        var reAuth = false
+        var updated = false
         req.email?.let {
             if (user.email != it && repository.existsUserByEmail(it)) {
                 throw HttpException(HttpStatus.BAD_REQUEST, "Usuário já cadastrado com esse email")
@@ -73,15 +72,15 @@ class UserService(
             log.info("Email [{}] is not null! Updating...", it)
             user.email = it
 
-            reAuth = true;
-            updated = true;
+            reAuth = true
+            updated = true
         }
 
         req.username?.let {
             log.info("Username [{}] is not null! Updating...", it)
             user.username = it
 
-            updated = true;
+            updated = true
         }
 
         req.password?.let {
@@ -95,8 +94,8 @@ class UserService(
             }
 
             user.password = hash(req.password)
-            reAuth = true;
-            updated = true;
+            reAuth = true
+            updated = true
         }
 
         if (!updated) {
