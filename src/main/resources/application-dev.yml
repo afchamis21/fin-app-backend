@@ -24,3 +24,7 @@ auth:
 cors:
   allowed-urls:
     - "http://localhost:5173"
+
+logging:
+  level:
+    io.github.afchamis21.finapp: DEBUG

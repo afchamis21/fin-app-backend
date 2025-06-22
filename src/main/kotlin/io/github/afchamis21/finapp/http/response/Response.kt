@@ -1,13 +1,13 @@
 package io.github.afchamis21.finapp.http.response
 
-import io.github.afchamis21.finapp.context.Context
+import io.github.afchamis21.finapp.http.Context
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 
-class Response<T>(
-    body: ResponseBody<T>,
-    status: HttpStatusCode
+data class Response<T>(
+    val body: ResponseBody<T>,
+    val status: HttpStatusCode
 ) : ResponseEntity<ResponseBody<T>>(body, status) {
 
     companion object {
