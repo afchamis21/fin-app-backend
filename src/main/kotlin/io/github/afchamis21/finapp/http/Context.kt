@@ -17,7 +17,7 @@ object Context {
         get() = threadLocal.get().executionId
 
     var userId: Long?
-        get() = threadLocal.get().userId
+        get() = threadLocal.get()?.userId
         set(value) {
             threadLocal.get().userId = value
 

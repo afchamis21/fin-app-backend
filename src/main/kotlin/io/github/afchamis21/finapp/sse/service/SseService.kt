@@ -3,6 +3,7 @@ package io.github.afchamis21.finapp.sse.service
 import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
+import io.github.afchamis21.finapp.sse.model.SSE_EVENTS
 import io.github.afchamis21.finapp.sse.repo.SseEmittersRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Repository
@@ -53,21 +54,25 @@ class SseService(
     }
 
     /**
-     * Sends an event to all active connections for the logged-in user
+     * Sends an event to all active connections for the target user (defaults to logged-in user)
      */
-    suspend fun send(event: SseEmitter.SseEventBuilder) {
-        val userId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
+    suspend fun send(name: SSE_EVENTS, data: Any, userId: Long? = null) {
+        val target = userId ?: Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
 
-        log.info("Attempting to send event to user $userId...")
+        log.info("Attempting to send event '$name' to user $target...")
 
-        val userEmitters = sseEmittersRepository.fetch(userId)
+        val userEmitters = sseEmittersRepository.fetch(target)
 
         if (userEmitters == null || userEmitters.getEmitters().isEmpty()) {
-            log.warn("Could not send event: No active emitters found for user $userId.")
+            log.warn("Could not send event '$name': No active emitters found for user $target.")
             return
         }
 
-        log.info("Sending event to ${userEmitters.getEmitters().size} emitter(s) for user $userId.")
-        userEmitters.emit(event)
+        log.info("Sending event '$name' to ${userEmitters.getEmitters().size} emitter(s) for user $target.")
+        userEmitters.emit(
+            SseEmitter.event()
+                .name(name.name)
+                .data(data)
+        )
     }
 }

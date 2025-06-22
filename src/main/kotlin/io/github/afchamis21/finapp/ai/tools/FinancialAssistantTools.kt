@@ -6,13 +6,13 @@ import io.github.afchamis21.finapp.entry.request.CreateEntryRequest
 import io.github.afchamis21.finapp.entry.service.EntryService
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
+import io.github.afchamis21.finapp.sse.model.SSE_EVENTS
 import io.github.afchamis21.finapp.sse.service.SseService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.springframework.ai.tool.annotation.Tool
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @Component
 class FinancialAssistantTools(
@@ -39,31 +39,15 @@ class FinancialAssistantTools(
             log.info("Dispatching background SSE notification for new entries for user $userId.")
             applicationScope.launch {
                 sseService.send(
-                    SseEmitter.event()
-                        .name("newEntries")
-                        .data(entries)
+                    userId = userId,
+                    name = SSE_EVENTS.NEW_ENTRIES,
+                    data = entries
                 )
 
                 log.info("Background SSE event 'newEntries' sent successfully for user $userId.")
             }
         } catch (e: Exception) {
             log.error("Error creating entries from tool for user $userId!", e)
-        }
-    }
-
-    @Tool(
-        name = "RefreshCategories",
-        description = "Re-loads all the categories used for registering new entries. Should be used if the user has created a new category during the chat conversation"
-    )
-    fun refreshCategories() {
-        val userId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
-        log.info("Tool 'RefreshCategories' invoked for user $userId.")
-
-        try {
-            chatContentRepository.loadCategories(userId)
-            log.info("Successfully triggered category refresh for user $userId.")
-        } catch (e: Exception) {
-            log.error("Error refreshing categories for user $userId!", e)
         }
     }
 }
