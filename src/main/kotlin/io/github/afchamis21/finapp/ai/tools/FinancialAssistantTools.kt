@@ -1,6 +1,5 @@
 package io.github.afchamis21.finapp.ai.tools
 
-import io.github.afchamis21.finapp.ai.chat.repo.ChatContentRepository
 import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.entry.request.CreateEntryRequest
 import io.github.afchamis21.finapp.entry.service.EntryService
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component
 @Component
 class FinancialAssistantTools(
     private val entryService: EntryService,
-    private val chatContentRepository: ChatContentRepository,
     private val applicationScope: CoroutineScope,
     private val sseService: SseService
 ) {
