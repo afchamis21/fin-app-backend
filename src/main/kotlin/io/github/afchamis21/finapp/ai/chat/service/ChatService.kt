@@ -5,7 +5,8 @@ import io.github.afchamis21.finapp.ai.chat.repo.ChatContentRepository
 import io.github.afchamis21.finapp.ai.chat.request.ChatMessageRequest
 import io.github.afchamis21.finapp.ai.tools.DateTools
 import io.github.afchamis21.finapp.ai.tools.FinancialAssistantTools
-import io.github.afchamis21.finapp.category.model.Category
+import io.github.afchamis21.finapp.category.response.CategoryDTO
+import io.github.afchamis21.finapp.category.service.CategoryService
 import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
@@ -29,7 +30,8 @@ class ChatService(
     private val repository: ChatContentRepository,
     private val chatClient: ChatClient,
     private val financialAssistantTools: FinancialAssistantTools,
-    private val dateTools: DateTools
+    private val dateTools: DateTools,
+    private val categoryService: CategoryService
 ) {
     private val log = logger()
 
@@ -38,7 +40,7 @@ class ChatService(
         log.info("Chat request initiated for user ${user.id}. Message: \"${request.message}\"")
 
         val history = getHistory(user)
-        val categories = repository.findCategoriesByUser(user)
+        val categories = categoryService.getCategoriesByOwner(active = true)
 
         log.info("Building prompt for user ${user.id} with ${history.size} history messages and ${categories.size} categories.")
         val responseSpec = financialChatClient(user, categories)
@@ -56,8 +58,8 @@ class ChatService(
         log.info("Received response from AI model for user ${user.id}.")
         log.debug("Raw AI response for user ${user.id}: \"$responseMessage\"")
 
-        if (!responseMessage.contains("TOOL_RAN")) {
-            log.info("No tool execution detected. Saving user and assistant messages to history for user ${user.id}.")
+        if (!responseMessage.contains("CONVERSATION_ENDED")) {
+            log.info("No conversation end detected. Saving user and assistant messages to history for user ${user.id}.")
             repository.saveMessages(
                 user = user,
                 listOf(
@@ -66,8 +68,9 @@ class ChatService(
                 )
             )
         } else {
-            log.info("Tool execution detected. Trimming 'TOOL_RAN' marker and skipping history save for user ${user.id}.")
-            responseMessage = responseMessage.replace("TOOL_RAN", "").trim()
+            log.info("Conversation end detected. Trimming 'CONVERSATION_ENDED' marker and cleaning history for user ${user.id}.")
+            responseMessage = responseMessage.replace("CONVERSATION_ENDED", "").trim()
+            resetChat(user)
         }
 
         log.info("Returning final chat response to user ${user.id}.")
@@ -76,7 +79,7 @@ class ChatService(
 
     private fun financialChatClient(
         user: User,
-        categories: List<Category>
+        categories: List<CategoryDTO>
     ): ChatClientRequestSpec {
         log.debug("Building ChatClientRequestSpec for user ${user.id}.")
         val categoryString = categories.joinToString(", ") {
@@ -143,8 +146,25 @@ class ChatService(
                     If you detect derived entries such as taxes or extra charges, include them in the summary before asking for confirmation.
                     Your goal is to ensure the user always understands and approves what will be saved.
                     
-                    If a tool has been executed, always add this EXACT SAME string to the END of your response: "TOOL_RAN"
                     END IMPORTANT
+                    
+                    ---
+                    IMPORTANT: SIGNALING CONVERSATION END
+                    ---
+                    Your main goal is to complete a user's request (like registering an entry or answering a question) and then signal that the task is finished.
+
+                    To do this, after a task is complete, you will provide your final, helpful message to the user. At the very end of this message, you MUST append the following exact flag on a new line:
+
+                    CONVERSATION_ENDED
+
+                    A task is considered complete AFTER you have called a tool or after you have answered a simple question that did not require a tool or after the user implies the conversation has ended.
+
+                    **CORRECT RESPONSE EXAMPLE:**
+                    "I've saved that expense for you. Is there anything else I can help with?
+
+                    CONVERSATION_ENDED"
+
+                    Your host application will look for this flag to clear the conversation history and reset for the next request. Do not add this flag while waiting for user confirmation.
                     """.trimIndent()
             )
             .tools(
@@ -161,9 +181,13 @@ class ChatService(
     }
 
     fun resetChat(user: User = userService.findCurrentUser()) {
-        log.info("Resetting chat history for user ${user.id}. All messages will be deleted.")
-        repository.deleteByUser(user)
-        log.info("Chat history for user ${user.id} has been successfully deleted.")
+        resetChat(user.id!!)
+    }
+
+    fun resetChat(userId: Long) {
+        log.info("Resetting chat history for user $userId. All messages will be deleted.")
+        repository.deleteByUser(userId)
+        log.info("Chat history for user $userId has been successfully deleted.")
     }
 
     fun fetchChat(): List<ChatMessageDTO> {

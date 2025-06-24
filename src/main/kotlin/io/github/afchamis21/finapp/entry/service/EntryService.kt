@@ -11,6 +11,7 @@ import io.github.afchamis21.finapp.entry.request.UpdateEntryRequest
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
 import io.github.afchamis21.finapp.user.service.UserService
+import jakarta.transaction.Transactional
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -119,6 +120,7 @@ class EntryService(
         return updatedEntry.toDTO()
     }
 
+    @Transactional
     fun delete(id: Long) {
         val ownerId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
         log.info("User $ownerId is attempting to delete entry $id.")

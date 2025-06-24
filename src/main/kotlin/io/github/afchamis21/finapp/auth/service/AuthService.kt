@@ -8,6 +8,7 @@ import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
 import io.github.afchamis21.finapp.user.service.UserService
+import jakarta.transaction.Transactional
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -41,6 +42,7 @@ class AuthService(
         return tokens
     }
 
+    @Transactional
     fun logout() {
         val userId = Context.userId ?: run {
             throw HttpException(HttpStatus.FORBIDDEN)

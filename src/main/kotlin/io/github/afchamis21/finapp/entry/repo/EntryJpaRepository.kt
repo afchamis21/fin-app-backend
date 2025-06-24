@@ -2,7 +2,6 @@ package io.github.afchamis21.finapp.entry.repo
 
 import io.github.afchamis21.finapp.entry.model.Entry
 import io.github.afchamis21.finapp.user.model.User
-import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.stereotype.Repository
@@ -21,6 +20,5 @@ interface EntryJpaRepository : JpaRepository<Entry, Long> {
     fun findAllByOwnerIdOrderByDateAsc(ownerId: Long): List<Entry>
 
     @Modifying
-    @Transactional
     fun deleteAllByIdAndOwnerId(id: Long, ownerId: Long)
 }

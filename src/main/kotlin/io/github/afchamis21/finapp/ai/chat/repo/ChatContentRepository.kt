@@ -1,7 +1,6 @@
 package io.github.afchamis21.finapp.ai.chat.repo
 
 import io.github.afchamis21.finapp.ai.chat.model.ChatContent
-import io.github.afchamis21.finapp.category.model.Category
 import io.github.afchamis21.finapp.category.repo.CategoryJpaRepository
 import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.user.model.User
@@ -17,6 +16,15 @@ class ChatContentRepository(
 
     fun findChatByUser(user: User): ChatContent {
         return findChatByUser(user.getCacheKey())
+    }
+
+    fun existsByUser(user: User): Boolean {
+        return existsByUser(user.getCacheKey())
+    }
+
+    private fun existsByUser(userId: Long): Boolean {
+        return chatCache.fetch(userId) != null
+
     }
 
     /**
@@ -42,31 +50,6 @@ class ChatContentRepository(
 
         content.addMessage(messages)
         log.info("Messages successfully added to in-memory chat history for user {}.", userId)
-    }
-
-    fun findCategoriesByUser(user: User): List<Category> {
-        val userId = user.getCacheKey()
-        log.debug("Finding categories for user {}.", userId)
-        val chat = findChatByUser(userId)
-
-        if (chat.getMessages().isEmpty() && chat.getCategories().isEmpty()) {
-            log.info("Chat history is empty for user {}. Triggering initial category load from database into cache.", userId)
-            loadCategories(userId)
-        }
-
-        return chat.getCategories()
-    }
-
-    /**
-     * Loads categories from the database and populates them into the user's cached ChatContent.
-     */
-    fun loadCategories(userId: Long) {
-        log.info("Loading categories from database for user {} into chat cache.", userId)
-        val chat = findChatByUser(userId)
-
-        val categories = categoryJpaRepository.findAllByOwnerIdAndActive(userId, true)
-        chat.loadCategories(categories)
-        log.info("Found and loaded {} categories from database for user {}.", categories.size, userId)
     }
 
     fun deleteByUser(user: User) {

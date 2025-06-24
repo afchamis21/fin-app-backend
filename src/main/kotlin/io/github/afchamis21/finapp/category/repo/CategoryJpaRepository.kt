@@ -1,7 +1,6 @@
 package io.github.afchamis21.finapp.category.repo
 
 import io.github.afchamis21.finapp.category.model.Category
-import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -19,11 +18,22 @@ interface CategoryJpaRepository : JpaRepository<Category, Long> {
     fun findAllByIdInAndOwnerId(id: List<Long>, ownerId: Long): MutableSet<Category>
 
     @Modifying
-    @Transactional
-    fun deleteByIdAndOwnerId(id: Long, ownerId: Long)
+    fun deleteByIdAndOwnerId(id: Long, ownerId: Long): Int
 
     @Modifying
-    @Transactional
     @Query("update Category set active = :active where id = :id and owner.id = :ownerId")
     fun updateByIdAndOwnerIdSetActive(id: Long, ownerId: Long, active: Boolean): Int
+
+    @Modifying
+    @Query(
+        value = """
+            DELETE FROM entry_categories
+            WHERE category_id IN (
+                SELECT category_id FROM categories
+                WHERE category_id = :categoryId AND owner_id = :ownerId
+            )
+        """,
+        nativeQuery = true
+    )
+    fun clearEntryAssociations(categoryId: Long, ownerId: Long): Int
 }

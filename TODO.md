@@ -1,8 +1,12 @@
-- [ ] Fix deletes on Many-to-Many relations
+- [X] Fix deletes on Many-to-Many relations
     - Eg: deleting a category doesn't work if any entries are using it, ideally we should just remove the categories
-      from
-      the entry (delete the join from the joining table)
+      from the entry (delete the join from the joining table)
+    - Note: also fixed in-memory updates on the UI after category deletion and edit
 - [X] Invalidate ALL data from the UI when logout or force logout happens
-- [ ] Integrate UI with SSE
-- [ ] Update chat category cache when category added/edited, etc.
-- [ ] Use AI to summarize large conversations to make it more cost-efficient
+- [X] Integrate UI with SSE
+- [X] Update chat category cache when category added/edited, etc.
+    - Note: I will just pull from db
+- [ ] Test SSE (Simple tests, multiple tabs, etc.)
+- [ ] Test all @Transactional touch points
+- [ ] Implement SSE state signal on the UI (Inside the chat or in the header)
+- [ ] Implement reset and refresh chat button on the UI

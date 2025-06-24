@@ -10,6 +10,7 @@ import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.exceptions.HttpException
 import io.github.afchamis21.finapp.http.Context
 import io.github.afchamis21.finapp.user.service.UserService
+import jakarta.transaction.Transactional
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 
@@ -95,13 +96,31 @@ class CategoryService(
         return categories.map { it.toDTO() }
     }
 
+    @Transactional
     fun deleteCategory(id: Long) {
         val userId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
-        log.info("User $userId is attempting to delete category $id.")
-        categoryJpaRepository.deleteByIdAndOwnerId(id, userId)
-        log.info("Delete command issued for category $id for user $userId.")
+        log.info("User '{}' is attempting to delete category '{}'.", userId, id)
+
+        val associationsCleared = categoryJpaRepository.clearEntryAssociations(id, userId)
+        log.info(
+            "Cleared {} entry association(s) for category '{}' owned by user '{}'.",
+            associationsCleared, id, userId
+        )
+
+        val categoriesDeleted = categoryJpaRepository.deleteByIdAndOwnerId(id, userId)
+
+        if (categoriesDeleted > 0) {
+            log.info("SUCCESS: Successfully deleted category '{}' for user '{}'.", id, userId)
+        } else {
+            log.warn(
+                "NO ACTION: Category '{}' was not found for user '{}' or was already deleted. " +
+                        "No category row was deleted.",
+                id, userId
+            )
+        }
     }
 
+    @Transactional
     fun updateStatus(id: Long, active: Boolean) {
         val userId = Context.userId ?: throw HttpException(HttpStatus.FORBIDDEN)
         log.info("User $userId is attempting to set active=$active for category $id.")

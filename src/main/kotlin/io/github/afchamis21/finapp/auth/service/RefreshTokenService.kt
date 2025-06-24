@@ -4,6 +4,7 @@ import io.github.afchamis21.finapp.auth.model.RefreshToken
 import io.github.afchamis21.finapp.auth.repo.RefreshTokenJpaRepository
 import io.github.afchamis21.finapp.config.logger
 import io.github.afchamis21.finapp.user.model.User
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -54,6 +55,7 @@ class RefreshTokenService(private val refreshTokenJpaRepository: RefreshTokenJpa
      * Deletes all refresh tokens associated with a specific user.
      * This is typically used during a full logout process.
      */
+    @Transactional
     fun deleteByUser(user: User) {
         log.info("Revoking all refresh tokens for user ${user.id}...")
         refreshTokenJpaRepository.deleteAllByOwner(user)
